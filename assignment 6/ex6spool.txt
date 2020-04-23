@@ -1,0 +1,413 @@
+SQL> set echo on;
+SQL> @D:/ex6.sql
+SQL> --*****************************************************
+SQL> --UCS1412				     B.Senthil Kumar
+SQL> --Database Lab			     Asst. Prof
+SQL> -- 			 Computer Science Department
+SQL> -- 			  SSN College of Engineering
+SQL> -- 				  senthil@ssn.edu.in
+SQL> --*****************************************************
+SQL> -- 	       PIZZA ORDERING DATASET
+SQL> -- 		Version 1.0
+SQL> -- 	       February 05, 2015
+SQL> --*****************************************************
+SQL> --Sources:
+SQL> -- 	This dataset is prepared for the assignment
+SQL> --      on DML, PL/SQL blocks in Database Programming.
+SQL> --      This is a test dataset - pizza ordered on 28 & 29th Jun 2015.
+SQL> --      Do NOT MODIFY the instances.
+SQL> --
+SQL> --******************************************************
+SQL> 
+SQL> 
+SQL> REm customer(cust_id, cust_name, address, phone)
+SQL> REM pizza (pizza_id, pizza_type, unit_price)
+SQL> REM orders(order_no, cust_id, order_date ,delv_date, total_amt)
+SQL> REM order_list(order_no, pizza_id, qty)
+SQL> 
+SQL> set serveroutput on;
+SQL> REM ------------------------------------------------------------------------------------------
+> set echo on;
+SQL> drop table order_list;
+
+Table dropped.
+
+SQL> drop table orders;
+
+Table dropped.
+
+SQL> drop table pizza;
+
+Table dropped.
+
+SQL> drop table customer;
+
+Table dropped.
+
+SQL> 
+SQL> 
+SQL> REM customer(cust_id, cust_name,address,phone)
+SQL> 
+SQL> create table customer(cust_id varchar2(4) constraint id_pk primary key,cust_name varchar2(15),address varchar2(30),phone number(10));
+
+Table created.
+
+SQL> 
+SQL> insert into customer values('c001','Hari','32 RING ROAD,ALWARPET',9001200031);
+
+1 row created.
+
+SQL> insert into customer values('c002','Ashok','42 bull ROAD,numgambakkam',9444120003);
+
+1 row created.
+
+SQL> insert into customer values('c003','Raj','12a RING ROAD,ALWARPET',9840112003);
+
+1 row created.
+
+SQL> insert into customer values('c004','Raghu','P.H ROAD,Annanagar',9845712993);
+
+1 row created.
+
+SQL> insert into customer values('c005','Sindhu','100 feet ROAD,vadapalani',9840166677);
+
+1 row created.
+
+SQL> insert into customer values('c006','Brinda','GST ROAD, TAMBARAM', 9876543210);
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> REM pizza (pizza_id, pizza_type, unit_price)
+SQL> 
+SQL> create table pizza(pizza_id varchar2(4) constraint pizzaid_pk primary key,pizza_type varchar2(10),unit_price number(3));
+
+Table created.
+
+SQL> 
+SQL> insert into pizza values('p001','pan',130);
+
+1 row created.
+
+SQL> insert into pizza values('p002','grilled',230);
+
+1 row created.
+
+SQL> insert into pizza values('p003','italian',200);
+
+1 row created.
+
+SQL> insert into pizza values('p004','spanish',260);
+
+1 row created.
+
+SQL> --insert into pizza values('p005','supremo',250);
+SQL> 
+SQL> 
+SQL> REM orders(order_no, cust_id, order_date ,delv_date)
+SQL> 
+SQL> 
+SQL> create table orders(order_no varchar2(5) constraint order_pk primary key,cust_id varchar2(4) constraint foriegn1 references customer(cust_id),order_date date,delv_date date);
+
+Table created.
+
+SQL> 
+SQL> insert into orders values('OP100','c001','28-JUN-2015','30-JUN-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP200','c002','28-JUN-2015','30-JUN-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP300','c003','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP400','c004','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP500','c001','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> insert into orders values('OP600','c002','29-JUN-2015','01-JUL-2015');
+
+1 row created.
+
+SQL> 
+SQL> 
+SQL> 
+SQL> REM order_list(order_no, pizza_id, qty)
+SQL> 
+SQL> create table order_list(order_no varchar2(5) constraint foriegn2 references orders(order_no),pizza_id varchar2(4) constraint foriegn3 references pizza(pizza_id),qty number(2),constraint prim_key primary key(order_no,pizza_id));
+
+Table created.
+
+SQL> 
+SQL> 
+SQL> insert into order_list values('OP100','p001',3);
+
+1 row created.
+
+SQL> insert into order_list values('OP100','p002',2);
+
+1 row created.
+
+SQL> insert into order_list values('OP100','p003',1);
+
+1 row created.
+
+SQL> insert into order_list values('OP100','p004',5);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP200','p003',2);
+
+1 row created.
+
+SQL> insert into order_list values('OP200','p001',6);
+
+1 row created.
+
+SQL> insert into order_list values('OP200','p004',8);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP300','p003',3);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP400','p001',3);
+
+1 row created.
+
+SQL> insert into order_list values('OP400','p004',1);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP500','p003',6);
+
+1 row created.
+
+SQL> insert into order_list values('OP500','p004',5);
+
+1 row created.
+
+SQL> insert into order_list values('OP500','p001',null);
+
+1 row created.
+
+SQL> 
+SQL> insert into order_list values('OP600','p002',3);
+
+1 row created.
+
+SQL> 
+SQL> alter table orders add(total_amt number(5),discount number(2),bill_amount number);
+
+Table altered.
+
+SQL> --******************************************************
+SQL> desc orders;
+ Name                                      Null?    Type
+ ----------------------------------------- -------- ----------------------------
+ ORDER_NO                                  NOT NULL VARCHAR2(5)
+ CUST_ID                                            VARCHAR2(4)
+ ORDER_DATE                                         DATE
+ DELV_DATE                                          DATE
+ TOTAL_AMT                                          NUMBER(5)
+ DISCOUNT                                           NUMBER(2)
+ BILL_AMOUNT                                        NUMBER
+
+SQL> REM:1. Write a stored function to display the total number of pizza's
+SQL> REM:ordered by the given order number.
+SQL> 
+SQL> create or replace function total_number(num orders.order_no%type)
+  2  return real IS
+  3  total number(3);
+  4  begin
+  5  	 select sum(qty) into total from order_list o where order_no=num;
+  6  	 return total;
+  7  end;
+  8  /
+
+Function created.
+
+SQL> 
+SQL> declare
+  2  x int;
+  3  name varchar2(20);
+  4  begin
+  5  	 name:='&order';
+  6  	 x:=tot_num(name);
+  7  	 dbms_output.put_line('Total Number Of Pizzas Ordered : '||x);
+  8  end;
+  9  /
+Enter value for order: OP200
+old   5:     name:='&order';
+new   5:     name:='OP200';
+Total Number Of Pizzas Ordered : 16                                             
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> 
+SQL> REM:Write a PL/SQL block to calculate the total amount, discount and billable amount
+SQL> REM:(Amount to be paid) as given below:
+SQL> REM:For total amount > 2000 and total amount < 5000:  Discount=5%
+SQL> REM:For total amount > 5000 and total amount < 10000:  Discount=10%
+SQL> REM:For total amount > 10000:  Discount=20%
+SQL> REM:Calculate the billable amount (after the discount) and update the same in orders
+SQL> REM:table.
+SQL> REM:Bill Amount = Total – Discount.
+SQL> 
+SQL> 
+SQL> create or replace procedure calculate is
+  2  tot number;
+  3  dis number;
+  4  bill number;
+  5  cursor c1 is select * from orders;
+  6  cursor c2 is select o.order_no,p.unit_price,o.qty from order_list o,pizza p where o.pizza_id = p.pizza_id;
+  7  begin
+  8  for cur in c1 loop
+  9  	tot :=0;
+ 10  	for cur1 in c2 loop
+ 11  		if(cur.order_no = cur1.order_no and cur1.qty is not null) then
+ 12  			tot := tot+(cur1.unit_price*cur1.qty);
+ 13  		end if;
+ 14  	end loop;
+ 15  	update orders set total_amt=tot where order_no = cur.order_no;
+ 16  	if(tot > 2000 and tot < 5000)then
+ 17  		dis := 5;
+ 18  	elsif(tot > 5000 and tot < 10000) then
+ 19  		dis := 10;
+ 20  	elsif(tot > 10000) then
+ 21  		dis := 20;
+ 22  	else
+ 23  		dis :=0;
+ 24  	end if;
+ 25  	update orders set discount=dis where order_no = cur.order_no;
+ 26  	bill := tot - tot*(dis/100);
+ 27  	update orders set bill_amount=bill where order_no = cur.order_no;
+ 28  end loop;
+ 29  end;
+ 30  /
+
+Procedure created.
+
+SQL> 
+SQL> call calculate();
+
+Call completed.
+
+SQL> select * from orders;
+
+ORDER CUST ORDER_DAT DELV_DATE  TOTAL_AMT   DISCOUNT BILL_AMOUNT                
+----- ---- --------- --------- ---------- ---------- -----------                
+OP100 c001 28-JUN-15 30-JUN-15       2350          5      2232.5                
+OP200 c002 28-JUN-15 30-JUN-15       3260          5        3097                
+OP300 c003 29-JUN-15 01-JUL-15        600          0         600                
+OP400 c004 29-JUN-15 01-JUL-15        650          0         650                
+OP500 c001 29-JUN-15 01-JUL-15       2500          5        2375                
+OP600 c002 29-JUN-15 01-JUL-15        690          0         690                
+
+6 rows selected.
+
+SQL> 
+SQL> REM:For the given order number, write a PL/SQL block to print the order as shown below:
+SQL> REM:Hint: Use the PL/SQL blocks created in 1 and 2
+SQL> 
+SQL> create or replace procedure bill(oid IN varchar2) is
+  2  tot int;
+  3  i int;
+  4  dis int;
+  5  bil number;
+  6  cursor c1 is select o.order_no,c.cust_name,o.order_date,c.phone from orders o,customer c where c.cust_id = o.cust_id;
+  7  cursor c2 is select o.order_no,p.pizza_type,o.qty,p.unit_price,o1.discount,o1.bill_amount from order_list o,pizza p,orders o1 where o.pizza_id = p.pizza_id and o.order_no = o1.order_no;
+  8  begin
+  9  tot :=0;
+ 10  dis := 0;
+ 11  bil :=0;
+ 12  i:=1;
+ 13  for cur in c1 loop
+ 14   if(oid = cur.order_no) then
+ 15   dbms_output.put_line('************************************************************');
+ 16   dbms_output.put_line('Order Number:'||oid||'	 Customer Name:'||cur.cust_name);
+ 17   dbms_output.put_line('Order Date:'||cur.order_date||'	Phone Number:'||cur.phone);
+ 18   dbms_output.put_line('************************************************************');
+ 19   end if;
+ 20  end loop;
+ 21  dbms_output.put_line('SNO	     PIZZA TYPE      QTY     PRICE   AMOUNT');
+ 22  for cur1 in c2 loop
+ 23   if(oid = cur1.order_no and cur1.qty is not null) then
+ 24  dbms_output.put_line(i||'	     '||cur1.pizza_type||'	     '||cur1.qty||'  '||cur1.unit_price||'   '||cur1.qty*cur1.unit_price);
+ 25  i:=i+1;
+ 26  tot := tot+(cur1.qty*cur1.unit_price);
+ 27  dis := cur1.discount;
+ 28  bil := cur1.bill_amount;
+ 29   end if;
+ 30  end loop;
+ 31  dbms_output.put_line('------------------------------------------------------------');
+ 32  dbms_output.put_line('	     Total = '||TotalOrder(oid)||'		     '||tot);
+ 33  dbms_output.put_line('------------------------------------------------------------');
+ 34  dbms_output.put_line('Total Amount 	     :Rs.'||tot);
+ 35  dbms_output.put_line('Discount('||dis||'%) 	     :Rs.'||tot*(dis/100));
+ 36  dbms_output.put_line('------------------------------------------------------------');
+ 37  dbms_output.put_line('Amount to be paid :Rs.'||bil);
+ 38  dbms_output.put_line('------------------------------------------------------------');
+ 39  dbms_output.put_line('Great Offers! Discount up to 25% on Diwali Festival Day...');
+ 40  dbms_output.put_line('************************************************************');
+ 41  end;
+ 42  /
+
+Procedure created.
+
+SQL> 
+SQL> declare
+  2    order_id varchar2(5);
+  3  	 x int;
+  4  begin
+  5  	 order_id := '&order_id';
+  6  	 select count(order_no) into x from order_list where order_no = order_id;
+  7  	 if(x = 0) then
+  8  	 dbms_output.put_line(order_id||' Not Found');
+  9  	 else
+ 10  	bill(order_id);
+ 11  	end if;
+ 12  end;
+ 13  /
+Enter value for order_id: OP100
+old   5:     order_id := '&order_id';
+new   5:     order_id := 'OP100';
+************************************************************                    
+Order Number:OP100       Customer Name:Hari                                     
+Order Date:28-JUN-15     Phone Number:9001200031                                
+************************************************************                    
+SNO	PIZZA TYPE	QTY	PRICE	AMOUNT                                                 
+1	spanish		5	260	1300                                                           
+2	italian		1	200	200                                                            
+3	grilled		2	230	460                                                            
+4	pan		3	130	390                                                                
+------------------------------------------------------------                    
+		Total = 11           	2350                                                    
+------------------------------------------------------------                    
+Total Amount		:Rs.2350                                                          
+Discount(5%)		:Rs.117.5                                                         
+------------------------------------------------------------                    
+Amount to be paid	:Rs.2232.5                                                    
+------------------------------------------------------------                    
+Great Offers! Discount up to 25% on Diwali Festival Day...                      
+************************************************************                    
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> spool off;
