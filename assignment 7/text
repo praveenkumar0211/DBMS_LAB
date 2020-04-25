@@ -1,0 +1,113 @@
+set echo on;
+@D:/air_cre.sql
+@D:/air_pop.sql
+
+
+
+REM:--------------------------------------------------
+REM:CREATION OF TRIGGES...
+REM:--------------------------------------------------
+
+REM:1)The date of arrival should be always later than or on the same date of departure.
+
+CREATE OR REPLACE TRIGGER ARRIVAL_TRIGGER
+BEFORE INSERT OR UPDATE ON fl_schedule
+for each row
+when(new.departs > new.arrives)
+begin
+   RAISE_APPLICATION_ERROR( -20001,'The date of arrival should be always later than or on the same date of departure.');
+end;
+/
+
+REM:TESTING TRIGGERS....
+
+REM:successful insert..
+INSERT INTO fl_schedule VALUES ('9E-3851','17-apr-2005',0710,'19-apr-2005',0800,120.40);
+select * from fl_schedule where flno = '9E-3851';
+
+REM:successful update..
+UPDATE fl_schedule set departs = '10-apr-05' where flno = 'JJ-7456' and departs='12-apr-2005';
+select * from fl_schedule where flno = 'JJ-7456' and departs ='10-apr-05' ;
+
+REM:failed insert...
+INSERT INTO fl_schedule VALUES ('QF-3045','15-apr-2005',1320,'12-apr-2005',1440,227.60);
+
+REM:failed update..
+UPDATE fl_schedule set departs = '23-apr-05' where flno = 'G7-3664';
+
+REM:--------------------------------------------------------------------
+
+REM : Flight number CX7520 is scheduled only on Tuesday, Friday and Sunday.
+CREATE OR REPLACE TRIGGER flightcx
+BEFORE INSERT OR UPDATE ON fl_schedule
+for each row
+declare
+ week_ind int;
+begin
+if(:new.flno = 'CX-7520')
+then
+     week_ind:=to_char(:new.departs,'d');
+     if (week_ind not in (1,4,6))
+     then
+            raise_application_error(num=>-20008,msg=>'Flight number CX-7520 is scheduled only on Tuesday, Friday and Sunday.');
+     end if;
+end if;
+end;
+/
+
+REM:TESTING TRIGGERS....
+
+REM:successful insert
+INSERT INTO fl_schedule values('CX-7520','24-apr-05',1230,'27-apr-05',1450,220.25);
+select * from fl_schedule where flno = 'CX-7520';
+
+REM:successful update..
+update fl_schedule set departs='10-APR-05' where flno = 'CX-7520' and departs = '12-APR-05';
+select * from fl_schedule where flno = 'CX-7520' and departs = '12-APR-05';
+
+REM:failed insert..
+INSERT INTO fl_schedule values('CX-7520','23-apr-05',1230,'27-apr-05',1450,220.25);
+select * from fl_schedule where flno = 'CX-7520';
+
+REM:failed update..
+update fl_schedule set departs='15-APR-05' where flno = 'CX-7520' and departs = '12-APR-05';
+
+REM:--------------------------------------------------------------------
+
+
+REM : 3
+REM : An aircraft is assigned to a flight only if its cruising range is more than the distance of the flights route.
+CREATE OR REPLACE TRIGGER aircraft_assign
+BEFORE INSERT OR UPDATE ON flights
+for each row
+declare
+cruising_range aircraft.cruisingrange%type;
+distance_route routes.distance%type;
+cursor c1 is select cruisingrange from aircraft where aid = :new.aid;
+cursor c2 is select distance from routes where routeID = :new.rID;
+begin
+open c1;
+open c2;
+fetch c1 into cruising_range;
+fetch c2 into distance_route;
+if(cruising_range < distance_route)
+then 
+	raise_application_error(num=>-20004,msg=>'Cruishing range is less than distance so flight cannot be assigned');
+end if;
+close c1;
+close c2;
+end;
+/
+
+REM:TESTING TRIGGERS....
+
+REM:successful insert..
+insert into flights values('AM-7878','LW100',2);
+select * from flights where flightNO = 'AM-7878';
+
+REM:successful update..
+update flights set aid = 5 where flightNo = '9E-3749';
+select * from flights where flightNO = '9E-3749';
+
+REM:failed insert...
+insert into flights values('AM-7878','LW100',16);
